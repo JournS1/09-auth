@@ -1,50 +1,50 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { fetchNoteById } from '@/lib/api';
+import { fetchNoteById } from '@/lib/api/clientApi';
+import type { Note } from '@/types/note';
 import Modal from '@/components/Modal/Modal';
-import css from './modal-note.module.css';
+import css from './NotePreview.module.css';
+import { useRouter } from 'next/navigation';
 
 export default function NotePreview({ id }: { id: string }) {
   const router = useRouter();
 
-  const { data: note, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<Note>({
     queryKey: ['note', id],
     queryFn: () => fetchNoteById(id),
-    refetchOnMount: false,
   });
 
-  const onClose = () => router.back();
+  const handleClose = () => router.back(); 
 
-  if (isLoading) {
+  if (isLoading)
     return (
-      <Modal onClose={onClose}>
-        <p>Loading, please wait...</p>
+      <Modal onClose={handleClose}>
+        <p>Loading…</p>
       </Modal>
     );
-  }
 
-  if (error || !note) {
+  if (error || !data)
     return (
-      <Modal onClose={onClose}>
-        <p>Something went wrong.</p>
+      <Modal onClose={handleClose}>
+        <p>Failed to load note.</p>
       </Modal>
     );
-  }
 
   return (
-    <Modal onClose={onClose}>
-      <div className={css.container}>
-        <div className={css.item}>
-          <div className={css.header}>
-            <h2>{note.title}</h2>
+    <Modal onClose={handleClose}>
+      <div className={css.wrapper}>
+        <article className={css.item}>
+          <header className={css.header}>
+            <h2>{data.title}</h2>
+          </header>
+
+          <p className={css.content}>{data.content}</p>
+
+          <div className={css.footer}>
+            <span className={css.tag}>Tag: {data.tag}</span>
           </div>
-          <p className={css.content}>{note.content}</p>
-          <p className={css.date}>
-            {new Date(note.createdAt).toLocaleString()}
-          </p>
-        </div>
+        </article>
       </div>
     </Modal>
   );
