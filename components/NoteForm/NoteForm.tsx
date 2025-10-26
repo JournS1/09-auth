@@ -26,7 +26,7 @@ export default function NoteForm() {
     setTitle(draft.title);
     setContent(draft.content);
     setTag(draft.tag as NoteTag);
-  }, []); /
+  }, []);
 
   const mutate = useMutation({
     mutationFn: createNote,
