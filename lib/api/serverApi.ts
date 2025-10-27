@@ -4,8 +4,8 @@ import { api } from './api';
 import type { Note } from '@/types/note';
 import type { User } from '@/types/user';
 
-function cookieHeaderFromNext(): string {
-  const jar = cookies();
+async function cookieHeaderFromNext(): Promise<string> {
+  const jar = await cookies();
   const entries: string[] = [];
   for (const c of jar.getAll()) {
     entries.push(`${c.name}=${encodeURIComponent(c.value)}`);
@@ -19,7 +19,7 @@ export async function sFetchNotes(params: {
   search?: string;
   tag?: string;
 }): Promise<Note[]> {
-  const Cookie = cookieHeaderFromNext();
+  const Cookie = await cookieHeaderFromNext();
   const res = await api.get<Note[]>('/notes', {
     params,
     headers: { Cookie },
@@ -28,7 +28,7 @@ export async function sFetchNotes(params: {
 }
 
 export async function sFetchNoteById(id: string): Promise<Note> {
-  const Cookie = cookieHeaderFromNext();
+  const Cookie = await cookieHeaderFromNext();
   const res = await api.get<Note>(`/notes/${id}`, {
     headers: { Cookie },
   });
@@ -36,7 +36,7 @@ export async function sFetchNoteById(id: string): Promise<Note> {
 }
 
 export async function sGetMe(): Promise<User | null> {
-  const Cookie = cookieHeaderFromNext();
+  const Cookie = await cookieHeaderFromNext();
   const res = await api.get<User | null>('/users/me', {
     headers: { Cookie },
   });
@@ -44,7 +44,7 @@ export async function sGetMe(): Promise<User | null> {
 }
 
 export async function sCheckSession(): Promise<AxiosResponse<User | null>> {
-  const Cookie = cookieHeaderFromNext();
+  const Cookie = await cookieHeaderFromNext();
   const res = await api.get<User | null>('/auth/session', {
     headers: { Cookie },
     withCredentials: true,
